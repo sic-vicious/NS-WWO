@@ -1,0 +1,3 @@
+conda activate Project-WWO
+cd E:\S2\Tesis\Source_code
+streamlit run frontend.py
