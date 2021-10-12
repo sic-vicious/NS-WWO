@@ -24,7 +24,6 @@ class Main:
     def input(self):
         st.session_state["optimize"] = False
         with st.sidebar.form("Input"):
-            st.title("Ahmad Nur Basid M")
             st.title("Input Parameter")
             st.number_input("Population", key="x_population", value=10)
             st.number_input("Iteration", key="iter", value=10)
