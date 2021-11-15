@@ -1,4 +1,7 @@
+import abc
+from numpy import asarray, random, where, pi, cos, exp, sqrt, full, zeros, array, arange, dtype
 import numpy as np
+import pandas as pd
 
 
 class NSP_Class:
@@ -196,9 +199,8 @@ class NSP_Class:
             # Memastikan sesuai Hard COnstraint 134
             nurse_array_HC134 = np.count_nonzero(nurse_array_col == 0, axis=0)
             nurse_array_HC134_Noon = np.count_nonzero(nurse_array_col == 1, axis=0)
-            nurse_array_HC134_Holiday = np.count_nonzero(nurse_array_col == 3, axis=0)
             nurse_array_HC134_Night = np.count_nonzero(nurse_array_col == 2, axis=0)
-
+            nurse_array_HC134_Holiday = np.count_nonzero(nurse_array_col == 3, axis=0)
             nurse_total_shift = np.vstack(
                 (
                     nurse_array_HC134,
@@ -225,7 +227,8 @@ class NSP_Class:
                 nurse_array_HC134 = np.count_nonzero(nurse_array_col == 0, axis=0)
                 nurse_array_HC134_Noon = np.count_nonzero(nurse_array_col == 1, axis=0)
                 nurse_array_HC134_Night = np.count_nonzero(nurse_array_col == 2, axis=0)
-                nurse_array_HC134_Holiday = np.count_nonzero(nurse_array_col == 3, axis=0
+                nurse_array_HC134_Holiday = np.count_nonzero(
+                    nurse_array_col == 3, axis=0
                 )
                 nurse_total_shift = np.vstack(
                     (
@@ -478,6 +481,17 @@ class WWO:
         self.k_max = k_max
         self.upper_bound = upper_bound
         self.lower_bound = lower_bound
+        self.dim = 2
+        self.best_solution = pd.Series(index=arange(1, self.dim+2), dtype=dtype('float64'))
+        self.best_solution.rename(index={self.dim+1: 'Fitness'}, inplace=True)
+        # self.iter_solution: [Iteration1:[dim1, dim2, ..., dimN, Fitness], Iteration2:[...], ..., IterationN:[...]]
+        self.iter_solution = pd.DataFrame(index=arange(1, self.iteration+1), columns=arange(1, self.dim+2))
+        self.iter_solution.rename(columns={self.dim+1: 'Fitness'}, inplace=True)
+        # self.iter_swarm_pos: [Iteration1:[Individual1[dim1, dim2, ..., dimN], ..., IndividualN[...]], ..., IterationN:[Individual1[...], ..., IndividualN[...]]]
+        index = pd.MultiIndex.from_product([arange(1, self.iteration+1), arange(1, self.x_population+1)],
+                                           names=['Iteration', 'Individual'])
+        columns = list(range(self.dim))
+        self.iter_swarm_pos = pd.DataFrame(index=index, columns=columns)
 
     def initialize_population(self) -> list:
         """Fungsi untuk menginisialisasi populasi awal
@@ -505,6 +519,9 @@ class WWO:
             cost_list.append(wave.cost(wave.nurse_second_schedule))
         return cost_list
 
+    def stopping_criteria(self, i):
+        return i >= self.iteration
+
     def optimize(self) -> tuple:
 
         # Inisialisasi populasi awal
@@ -523,61 +540,73 @@ class WWO:
         )
         # Inisialisasi nilai beta (untuk nanti diupdate setiap iterasi secara linear)
         beta = self.beta_max
-        self.best_fit_iteration = []
-        self.best_fit_iteration.append(wave_population_cost_list[min_index])
-        # Iterasi berdasarkan jumlah iterasi maksimal
-        for iteration in range(self.iteration):
+        
+        self.iteration = 0
+        while not self.stopping_criteria(self.iteration):
+            self.iteration += 1
+            self.iter_swarm_pos.loc[self.iteration] = wave_population_list
+            self.iter_solution.loc[self.iteration] = np.append(best_pos, best_fit)
+            if self.debug:
+                logger.info("Iteration:{i}/{iterations} - {iter_sol}".format(i=self.iter, iterations=self.iterations,
+                                                                             iter_sol=self.iter_solution.loc[
+                                                                                 self.iter].to_dict()))
+            #self.best_fit_iteration = []
+            #self.best_fit_iteration.append(wave_population_cost_list[min_index])
+            # Iterasi berdasarkan jumlah iterasi maksimal
+        #for iteration in range(self.x_population):
             # new_fit_counter = 0
             # best_fit_counter = 0
             # not_found_counter = 0
             # if best_fit == 0.0:
             #     break
             # Iterasi untuk tiap gelombang dalam populasi
-            for index, wave in enumerate(wave_population_list):
-                new_pos, new_fit = self.propagation(wave)
+            for i in range(self.x_population):
+                new_pos, new_fit = self.propagation(wave[i])
                 # print(new_pos,new_fit)
-                if new_fit < wave_population_cost_list[index]:
+                if new_fit < wave_population_cost_list[i]:
                     # new_fit_counter += 1
-                    wave.nurse_second_schedule, wave_population_cost_list[index] = (
-                        new_pos,
-                        new_fit,
-                    )
+                    wave.nurse_second_schedule[i], wave_population_cost_list[i] = new_pos, new_fit#(new_pos,new_fit,)
                     wave_height[index] = self.hmax
-                    if new_fit < best_fit and index != min_index:
+                    if new_fit < best_fit and i != min_index: #Breaking
                         # best_fit_counter += 1
-                        new_pos, new_fit, wave_length[index] = self.breaking(
-                            new_pos, new_fit, wave_length[index], beta, wave
+                        new_pos, new_fit, wave_length[i] = self.breaking(
+                            new_pos, new_fit, wave_length[i], beta, wave
                         )
                         best_pos, best_fit = new_pos, new_fit
                         
-                        # print(best_fit)
+                        print(best_fit)
                 else:
                     # not_found_counter += 1
-                    wave_height[index] -= 1
-                    if wave_height[index] == 0:
-                        fit_old = wave_population_cost_list[index]
+                    wave_height[i] -= 1 # decrease wave height
+                    if wave_height[i] == 0: # Refraction
+                        fit_old = wave_population_cost_list[i]
                         (
                             wave.nurse_second_schedule,
-                            wave_population_cost_list[index],
-                        ) = self.refraction(wave.nurse_second_schedule, best_pos, wave)
-                        wave_height[index] = self.hmax
-                        wave_length[index] = self.set_wave_length(
-                            wave_length[index],
+                            wave_population_cost_list[i],
+                        ) = self.refraction(wave.nurse_second_schedule[i], best_pos, wave)
+                        wave_height[i] = self.hmax
+                        wave_length[i] = self.set_wave_length(
+                            wave_length[i],
                             fit_old,
-                            wave_population_cost_list[index],
+                            wave_population_cost_list[i],
                         )
 
             min_index, max_index = np.argmin(wave_population_cost_list), np.argmax(
                 wave_population_cost_list
             )
+            best_pos, best_fit = wave.nurse_second_schedule[min_index], wave_population_cost_list[min_index]
+            wave_length = np.asarray([self.update_wave_length(wave_length[i], wave_population_cost_list[i], wave_population_cost_list[max_index], wave_population_cost_list[min_index]) for i in range(self.x_population)])
+            
+            """
             wave_length = self.update_wave_length(
                 wave_length,
                 wave_population_cost_list,
                 wave_population_cost_list[max_index],
                 wave_population_cost_list[min_index],
             )
+            """
 
-            beta = self.update_beta(iteration)
+            beta = self.update_beta()
             # print(
             #     f"""
             #       new fit = {new_fit_counter}
@@ -585,7 +614,8 @@ class WWO:
             #       not found = {not_found_counter}
             #       """
             # )
-            self.best_fit_iteration.append(best_fit)
+        self.best_solution.iloc[:] = np.append(best_pos ,best_fit)
+        #self.best_fit_iteration.append(best_fit)
         # best_pos = best_pos.reshape(-1, 4)
         # where_one_col = np.argwhere(best_pos == 1)[:, 1]
         # best_pos = where_one_col.reshape(self.NSP.unit_total_nurse, self.NSP.day)
@@ -628,7 +658,7 @@ class WWO:
         return new_pos
 
     def breaking(self, new_pos, new_fit, wave_length, beta, wave) -> tuple:
-        print("breaking")
+        #print("breaking")
         k = np.random.randint(1, self.k_max)
         temp = np.random.permutation(new_pos.shape[0])[:k]
         for i in range(k):
