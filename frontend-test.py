@@ -27,7 +27,7 @@ class Main:
             st.write('Ahmad Nur Basid Makmun')
             st.title("Input Parameter")
             st.number_input("Population", key="x_population", value=10)
-            st.number_input("Iteration", key="iter", value=10000)
+            st.number_input("Iteration", key="iter", value=100)
             st.number_input("Hard Constraint Multiplier", key="multiplier", value=0)
             st.number_input("Soft Constraint Multiplier", key="softmultiplier", value=0)
             st.number_input(
