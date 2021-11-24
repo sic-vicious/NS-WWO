@@ -94,9 +94,9 @@ class Main:
         st.title("Optimizing Nurse Scheduling Problem with Water Wave Optimization")
         units_name = ["IGD", "Rawat Inap", "Anastesi", "ICU", "OK"]
         units_nurse_num = np.array([38, 122, 23, 28, 33])
-        units_morning_shift = np.array([8, 34, 6, 7, 8])
-        units_afternoon_shift = np.array([8, 34, 6, 7, 8])
-        units_night_shift = np.array([6, 24, 5, 6, 6])
+        units_morning_shift = np.array([10, 34, 6, 8, 10])
+        units_afternoon_shift = np.array([10, 34, 6, 8, 9])
+        units_night_shift = np.array([8, 24, 5, 6, 7])
 
         units_minimum_shift = np.vstack(
             (units_morning_shift, units_afternoon_shift, units_night_shift)
@@ -264,6 +264,7 @@ class Main:
             with cols2[1]:
                 with st.spinner("Processing IGD Schedule..."):
                     igd_pos, _ = WWO_Class_Dict["IGD"].optimize()
+                    '''
                     igd_plot_text.subheader("IGD WWO Plot")
                     data_igd = pd.DataFrame(
                         {
@@ -279,9 +280,10 @@ class Main:
                         .encode(x="Iteration", y="Cost Jadwal 2 Unit IGD")
                     )
                     igd_plot.altair_chart(chart_igd, use_container_width=True)
+                    '''
 
-                    igd_cost_text.subheader(
-                        f"""Cost {max(WWO_Class_Dict["IGD"].best_fit_iteration)} -> {min(WWO_Class_Dict["IGD"].best_fit_iteration)}"""
+                    igd_cost_text.subheader("IGD With WWO"
+                        #f"""Cost {max(WWO_Class_Dict["IGD"].best_fit_iteration)} -> {min(WWO_Class_Dict["IGD"].best_fit_iteration)}"""
                     )
                     igd_2.dataframe(
                         pd.DataFrame(
@@ -300,6 +302,7 @@ class Main:
 
                 with st.spinner("Processing Rawat Inap Schedule..."):
                     r_inap_pos, _ = WWO_Class_Dict["Rawat Inap"].optimize()
+                    '''
                     r_inap_plot_text.subheader("Rawat Inap WWO Plot")
                     data_r_inap = pd.DataFrame(
                         {
@@ -315,8 +318,9 @@ class Main:
                         .encode(x="Iteration", y="Cost Jadwal 2 Unit Rawat Inap")
                     )
                     r_inap_plot.altair_chart(chart_r_inap, use_container_width=True)
-                    r_inap_cost_text.subheader(
-                        f"""Cost {max(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)} -> {min(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)}"""
+                    '''
+                    r_inap_cost_text.subheader("Rawat Inap With WWO"
+                        #f"""Cost {max(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)} -> {min(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)}"""
                     )
                     r_inap_2.dataframe(
                         pd.DataFrame(
@@ -333,6 +337,7 @@ class Main:
                     )
                 with st.spinner("Processing Anastesi Schedule..."):
                     anastesi_pos, _ = WWO_Class_Dict["Anastesi"].optimize()
+                    '''
                     anastesi_plot_text.subheader("Anastesi WWO Plot")
                     data_anastesi = pd.DataFrame(
                         {
@@ -348,8 +353,9 @@ class Main:
                         .encode(x="Iteration", y="Cost Jadwal 2 Unit Anastesi")
                     )
                     anastesi_plot.altair_chart(chart_anastesi, use_container_width=True)
-                    anastesi_cost_text.subheader(
-                        f"""Cost {max(WWO_Class_Dict["Anastesi"].best_fit_iteration)} -> {min(WWO_Class_Dict["Anastesi"].best_fit_iteration)}"""
+                    '''
+                    anastesi_cost_text.subheader("Anastesi With WWO"
+                        #f"""Cost {max(WWO_Class_Dict["Anastesi"].best_fit_iteration)} -> {min(WWO_Class_Dict["Anastesi"].best_fit_iteration)}"""
                     )
                     anastesi_2.dataframe(
                         pd.DataFrame(
@@ -366,6 +372,7 @@ class Main:
                     )
                 with st.spinner("Processing ICU Schedule..."):
                     icu_pos, _ = WWO_Class_Dict["ICU"].optimize()
+                    '''
                     icu_plot_text.subheader("ICU WWO Plot")
                     data_icu = pd.DataFrame(
                         {
@@ -381,8 +388,9 @@ class Main:
                         .encode(x="Iteration", y="Cost Jadwal 2 Unit ICU")
                     )
                     icu_plot.altair_chart(chart_icu, use_container_width=True)
-                    icu_cost_text.subheader(
-                        f"""Cost {max(WWO_Class_Dict["ICU"].best_fit_iteration)} -> {min(WWO_Class_Dict["ICU"].best_fit_iteration)}"""
+                    '''
+                    icu_cost_text.subheader("ICU With WWO"
+                       # f"""Cost {max(WWO_Class_Dict["ICU"].best_fit_iteration)} -> {min(WWO_Class_Dict["ICU"].best_fit_iteration)}"""
                     )
                     icu_2.dataframe(
                         pd.DataFrame(
@@ -399,6 +407,7 @@ class Main:
                     )
                 with st.spinner("Processing OK Schedule..."):
                     ok_pos, _ = WWO_Class_Dict["OK"].optimize()
+                    '''
                     ok_plot_text.subheader("OK WWO Plot")
                     data_ok = pd.DataFrame(
                         {
@@ -414,8 +423,9 @@ class Main:
                         .encode(x="Iteration", y="Cost Jadwal 2 Unit OK")
                     )
                     ok_plot.altair_chart(chart_ok, use_container_width=True)
-                    ok_cost_text.subheader(
-                        f"""Cost {max(WWO_Class_Dict["OK"].best_fit_iteration)} -> {min(WWO_Class_Dict["OK"].best_fit_iteration)}"""
+                    '''
+                    ok_cost_text.subheader("OK With WWO"
+                       # f"""Cost {max(WWO_Class_Dict["OK"].best_fit_iteration)} -> {min(WWO_Class_Dict["OK"].best_fit_iteration)}"""
                     )
                     ok_2.dataframe(
                         pd.DataFrame(
