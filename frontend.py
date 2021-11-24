@@ -27,7 +27,13 @@ class Main:
             st.write('Ahmad Nur Basid Makmun')
             st.title("Input Parameter")
             st.number_input("Population", key="x_population", value=10)
+<<<<<<< HEAD
             st.number_input("Iteration", key="iter", value=10)
+=======
+            st.number_input("Iteration", key="iter", value=100)
+            st.number_input("Hard Constraint Multiplier", key="multiplier", value=0)
+            st.number_input("Soft Constraint Multiplier", key="softmultiplier", value=0)
+>>>>>>> 4996cd5d3f2b203ed20799c3f7933278c2a8a03c
             st.number_input(
                 "H Max (Max Wave Height)",
                 key="hmax",
@@ -85,8 +91,13 @@ class Main:
                 max_value=1.0,
             )
             st.number_input("K Max", key="k_max", value=12)
+<<<<<<< HEAD
             st.number_input("Upper Bound", key="upper_bound", value=3.3)
             st.number_input("Lower Bound", key="lower_bound", value=0.0)
+=======
+            st.number_input("Upper Bound", key="upper_bound", value=3.5)
+            st.number_input("Lower Bound", key="lower_bound", value=0)
+>>>>>>> 4996cd5d3f2b203ed20799c3f7933278c2a8a03c
             if st.form_submit_button("Optimize"):
                 st.session_state["optimize"] = True
 
