@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from backend import NSP_Class, WWO
+from backendtest import NSP_Class, WWO
 import streamlit as st
 import altair as alt
 import pandas as pd
@@ -27,9 +27,7 @@ class Main:
             st.write('Ahmad Nur Basid Makmun')
             st.title("Input Parameter")
             st.number_input("Population", key="x_population", value=10)
-            st.number_input("Iteration", key="iter", value=100)
-            st.number_input("Hard Constraint Multiplier", key="multiplier", value=0)
-            st.number_input("Soft Constraint Multiplier", key="softmultiplier", value=0)
+            st.number_input("Iteration", key="iter", value=10)
             st.number_input(
                 "H Max (Max Wave Height)",
                 key="hmax",
@@ -40,18 +38,20 @@ class Main:
                 format="%f",
             )
             st.number_input(
-                "Lambda (Wavelength)",
-                key="lambd",
-                value=0.5,
+                "Alpha",
+                key="alpha",
+                value=1.001,
                 step=0.000001,
                 max_value=100000.0,
                 min_value=0.0,
                 format="%f",
             )
+            st.number_input("Hard Constraint Multiplier", key="multiplier", value=0)
+            st.number_input("Soft Constraint Multiplier", key="softmultiplier", value=0)
             st.number_input(
-                "Alpha",
-                key="alpha",
-                value=1.001,
+                "Lambda (Wavelength)",
+                key="lambd",
+                value=0.5,
                 step=0.000001,
                 max_value=100000.0,
                 min_value=0.0,
@@ -85,8 +85,8 @@ class Main:
                 max_value=1.0,
             )
             st.number_input("K Max", key="k_max", value=12)
-            st.number_input("Upper Bound", key="upper_bound", value=4)
-            st.number_input("Lower Bound", key="lower_bound", value=0)
+            st.number_input("Upper Bound", key="upper_bound", value=3.3)
+            st.number_input("Lower Bound", key="lower_bound", value=0.0)
             if st.form_submit_button("Optimize"):
                 st.session_state["optimize"] = True
 
@@ -94,9 +94,9 @@ class Main:
         st.title("Optimizing Nurse Scheduling Problem with Water Wave Optimization")
         units_name = ["IGD", "Rawat Inap", "Anastesi", "ICU", "OK"]
         units_nurse_num = np.array([38, 122, 23, 28, 33])
-        units_morning_shift = np.array([8, 34, 6, 7, 8])
-        units_afternoon_shift = np.array([8, 34, 6, 7, 8])
-        units_night_shift = np.array([6, 24, 5, 6, 6])
+        units_morning_shift = np.array([10, 34, 6, 8, 10])
+        units_afternoon_shift = np.array([10, 34, 6, 8, 9])
+        units_night_shift = np.array([8, 24, 5, 6, 7])
 
         units_minimum_shift = np.vstack(
             (units_morning_shift, units_afternoon_shift, units_night_shift)
@@ -219,8 +219,7 @@ class Main:
                             )
                         ],
                     )
-                )
-
+                )            
             with cols2[1]:
                 igd_plot_text = st.empty()
                 igd_plot = st.empty()
@@ -281,9 +280,10 @@ class Main:
                     )
                     igd_plot.altair_chart(chart_igd, use_container_width=True)
                     '''
-                    igd_cost_text.subheader("IGD With WWO")
-                    '''    f"""Cost {max(WWO_Class_Dict["IGD"].best_fit_iteration)} -> {min(WWO_Class_Dict["IGD"].best_fit_iteration)}"""
-                    )'''
+
+                    igd_cost_text.subheader("IGD With WWO"
+                        #f"""Cost {max(WWO_Class_Dict["IGD"].best_fit_iteration)} -> {min(WWO_Class_Dict["IGD"].best_fit_iteration)}"""
+                    )
                     igd_2.dataframe(
                         pd.DataFrame(
                             igd_pos,
@@ -318,9 +318,9 @@ class Main:
                     )
                     r_inap_plot.altair_chart(chart_r_inap, use_container_width=True)
                     '''
-                    r_inap_cost_text.subheader("Rawat Inap With WWO")
-                    '''    f"""Cost {max(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)} -> {min(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)}"""
-                    )'''
+                    r_inap_cost_text.subheader("Rawat Inap With WWO"
+                        #f"""Cost {max(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)} -> {min(WWO_Class_Dict["Rawat Inap"].best_fit_iteration)}"""
+                    )
                     r_inap_2.dataframe(
                         pd.DataFrame(
                             r_inap_pos,
@@ -353,9 +353,9 @@ class Main:
                     )
                     anastesi_plot.altair_chart(chart_anastesi, use_container_width=True)
                     '''
-                    anastesi_cost_text.subheader("Anastesi With WWO")
-                    '''   f"""Cost {max(WWO_Class_Dict["Anastesi"].best_fit_iteration)} -> {min(WWO_Class_Dict["Anastesi"].best_fit_iteration)}"""
-                    )'''
+                    anastesi_cost_text.subheader("Anastesi With WWO"
+                        #f"""Cost {max(WWO_Class_Dict["Anastesi"].best_fit_iteration)} -> {min(WWO_Class_Dict["Anastesi"].best_fit_iteration)}"""
+                    )
                     anastesi_2.dataframe(
                         pd.DataFrame(
                             anastesi_pos,
@@ -388,9 +388,9 @@ class Main:
                     )
                     icu_plot.altair_chart(chart_icu, use_container_width=True)
                     '''
-                    icu_cost_text.subheader("ICU With WWO")
-                    '''   f"""Cost {max(WWO_Class_Dict["ICU"].best_fit_iteration)} -> {min(WWO_Class_Dict["ICU"].best_fit_iteration)}"""
-                    )'''
+                    icu_cost_text.subheader("ICU With WWO"
+                       # f"""Cost {max(WWO_Class_Dict["ICU"].best_fit_iteration)} -> {min(WWO_Class_Dict["ICU"].best_fit_iteration)}"""
+                    )
                     icu_2.dataframe(
                         pd.DataFrame(
                             icu_pos,
@@ -423,9 +423,9 @@ class Main:
                     )
                     ok_plot.altair_chart(chart_ok, use_container_width=True)
                     '''
-                    ok_cost_text.subheader("OK With WWO")
-                    '''    f"""Cost {max(WWO_Class_Dict["OK"].best_fit_iteration)} -> {min(WWO_Class_Dict["OK"].best_fit_iteration)}"""
-                    )'''
+                    ok_cost_text.subheader("OK With WWO"
+                       # f"""Cost {max(WWO_Class_Dict["OK"].best_fit_iteration)} -> {min(WWO_Class_Dict["OK"].best_fit_iteration)}"""
+                    )
                     ok_2.dataframe(
                         pd.DataFrame(
                             ok_pos,

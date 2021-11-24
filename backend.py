@@ -493,16 +493,15 @@ class WWO:
 
     def cost_function(self, wave_population_list: list) -> list:
         """Fungsi untuk menghitung cost dari setiap wave
-
         Args:
             wave_population_list: List berisi wave
-
         Returns:
             cost_list: List berisi total cost dari setiap wave
         """
         cost_list = []
         for wave in wave_population_list:
             cost_list.append(wave.cost(wave.nurse_second_schedule))
+        print(cost_list)
         return cost_list
 
     def optimize(self) -> tuple:
@@ -523,19 +522,15 @@ class WWO:
         )
         # Inisialisasi nilai beta (untuk nanti diupdate setiap iterasi secara linear)
         beta = self.beta_max
+
         self.best_fit_iteration = []
         self.best_fit_iteration.append(wave_population_cost_list[min_index])
         # Iterasi berdasarkan jumlah iterasi maksimal
         for iteration in range(self.iteration):
-            # new_fit_counter = 0
-            # best_fit_counter = 0
-            # not_found_counter = 0
-            # if best_fit == 0.0:
-            #     break
             # Iterasi untuk tiap gelombang dalam populasi
             for index, wave in enumerate(wave_population_list):
                 new_pos, new_fit = self.propagation(wave)
-                # print(new_pos,new_fit)
+                #print(new_pos,new_fit)
                 if new_fit < wave_population_cost_list[index]:
                     # new_fit_counter += 1
                     wave.nurse_second_schedule, wave_population_cost_list[index] = (
@@ -544,15 +539,11 @@ class WWO:
                     )
                     wave_height[index] = self.hmax
                     if new_fit < best_fit and index != min_index:
-                        # best_fit_counter += 1
                         new_pos, new_fit, wave_length[index] = self.breaking(
                             new_pos, new_fit, wave_length[index], beta, wave
                         )
                         best_pos, best_fit = new_pos, new_fit
-                        
-                        # print(best_fit)
                 else:
-                    # not_found_counter += 1
                     wave_height[index] -= 1
                     if wave_height[index] == 0:
                         fit_old = wave_population_cost_list[index]
@@ -566,10 +557,8 @@ class WWO:
                             fit_old,
                             wave_population_cost_list[index],
                         )
-
             min_index, max_index = np.argmin(wave_population_cost_list), np.argmax(
-                wave_population_cost_list
-            )
+                wave_population_cost_list)
             wave_length = self.update_wave_length(
                 wave_length,
                 wave_population_cost_list,
@@ -578,17 +567,14 @@ class WWO:
             )
 
             beta = self.update_beta(iteration)
-            # print(
-            #     f"""
-            #       new fit = {new_fit_counter}
-            #       best fit = {best_fit_counter}
-            #       not found = {not_found_counter}
-            #       """
-            # )
+            print(
+                 f"""
+                   new fit = {new_fit}
+                   best fit = {best_fit}
+                   """
+            )
             self.best_fit_iteration.append(best_fit)
-        # best_pos = best_pos.reshape(-1, 4)
-        # where_one_col = np.argwhere(best_pos == 1)[:, 1]
-        # best_pos = where_one_col.reshape(self.NSP.unit_total_nurse, self.NSP.day)
+
         best_pos = best_pos.reshape(self.NSP.unit_total_nurse,self.NSP.day)
         best_pos = best_pos.astype(int)
         best_pos = np.where(best_pos.astype(str)=="0","Pagi",best_pos.astype(str))
@@ -598,7 +584,7 @@ class WWO:
         return best_pos, best_fit
 
     def propagation(self, wave: NSP_Class) -> tuple:
-        # print("propagate")
+
         l = np.abs(self.upper_bound - self.lower_bound)
         new_pos = (
             wave.nurse_second_schedule
